@@ -1,6 +1,6 @@
 # Example outputs
 
-Pre-generated PNG and SVG map images are included in the `examples/` directory so you can see what the project produces without running anything.
+Pre-generated PNG and SVG map images are in [`docs/examples/`](docs/examples/) so you can see what the project produces without running anything. These same images are served on the [project site](https://radiolabme.github.io/snohomish-em-maps/).
 
 To regenerate these yourself: `./generate.py all`
 
@@ -10,27 +10,27 @@ To regenerate these yourself: `./generate.py all`
 
 | File | Description |
 |------|-------------|
-| `washington_counties.png` | Washington State with all 39 counties labeled, Snohomish highlighted in blue |
+| [`washington_counties.png`](docs/examples/washington_counties.png) | Washington State with all 39 counties labeled, Snohomish highlighted in blue |
 
 ### Hazard layers
 
 | File | Description |
 |------|-------------|
-| `snohomish_flood_zones.png` | FEMA flood hazard zones — red (high risk), orange (moderate), gray (minimal) |
-| `snohomish_volcanic.png` | Glacier Peak & Mt Baker lahars (purple), near-volcano hazards, tephra zone |
-| `snohomish_emergency_services.png` | 18 fire protection districts + 3 hospital districts |
-| `snohomish_water_mgmt.png` | Diking, drainage, and flood control district boundaries |
+| [`snohomish_flood_zones.png`](docs/examples/snohomish_flood_zones.png) | FEMA flood hazard zones — red (high risk), orange (moderate), gray (minimal) |
+| [`snohomish_volcanic.png`](docs/examples/snohomish_volcanic.png) | Glacier Peak & Mt Baker lahars (purple), near-volcano hazards, tephra zone |
+| [`snohomish_emergency_services.png`](docs/examples/snohomish_emergency_services.png) | 18 fire protection districts + 3 hospital districts |
+| [`snohomish_water_mgmt.png`](docs/examples/snohomish_water_mgmt.png) | Diking, drainage, and flood control district boundaries |
 
 ### Combined & operational maps
 
 | File | Description |
 |------|-------------|
-| `snohomish_combined.png` | All hazards + roads + cities + public lands + hillshade terrain |
-| `snohomish_facilities.png` | 9 hospitals, 70 fire stations, 243 schools, 20 police stations |
-| `snohomish_terrain.png` | 4,636 trails and 2,904 forest roads on hillshade — SAR planning map |
-| `snohomish_population.png` | Population density choropleth with flood/lahar exposure overlay |
-| `snohomish_evacuation.png` | Roads by capacity, 16 bottleneck segments, 4 annotated critical points |
-| `snohomish_rivers.png` | 19,705 waterways, 64 boat ramps, 13 labeled major rivers |
+| [`snohomish_combined.png`](docs/examples/snohomish_combined.png) | All hazards + roads + cities + public lands + hillshade terrain |
+| [`snohomish_facilities.png`](docs/examples/snohomish_facilities.png) | 9 hospitals, 70 fire stations, 243 schools, 20 police stations |
+| [`snohomish_terrain.png`](docs/examples/snohomish_terrain.png) | 4,636 trails and 2,904 forest roads on hillshade — SAR planning map |
+| [`snohomish_population.png`](docs/examples/snohomish_population.png) | Population density choropleth with flood/lahar exposure overlay |
+| [`snohomish_evacuation.png`](docs/examples/snohomish_evacuation.png) | Roads by capacity, 16 bottleneck segments, 4 annotated critical points |
+| [`snohomish_rivers.png`](docs/examples/snohomish_rivers.png) | 19,705 waterways, 64 boat ramps, 13 labeled major rivers |
 
 ## SVG versions
 
