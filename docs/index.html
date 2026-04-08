@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snohomish County Emergency Management Maps</title>
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --text: #1a1a1a;
+    --muted: #666;
+    --border: #e0e0e0;
+    --accent: #1565c0;
+    --accent-light: #e3f2fd;
+    --red: #c62828;
+    --purple: #6a1b9a;
+    --green: #2e7d32;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  header {
+    background: var(--text);
+    color: #fff;
+    padding: 3rem 2rem 2.5rem;
+    text-align: center;
+  }
+
+  header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+  }
+
+  header p {
+    color: #aaa;
+    font-size: 1.05rem;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  header .links {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  header .links a {
+    color: #fff;
+    background: rgba(255,255,255,0.12);
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background 0.15s;
+  }
+
+  header .links a:hover { background: rgba(255,255,255,0.22); }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin: -1.5rem auto 3rem;
+    max-width: 900px;
+    padding: 0 1.5rem;
+  }
+
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem;
+    text-align: center;
+  }
+
+  .stat .number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .stat .label {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 0.2rem;
+  }
+
+  .stat.red .number { color: var(--red); }
+  .stat.blue .number { color: var(--accent); }
+  .stat.purple .number { color: var(--purple); }
+  .stat.green .number { color: var(--green); }
+
+  section { margin-bottom: 3rem; }
+
+  section h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+
+  section h2 + p {
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .map-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .map-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: box-shadow 0.15s;
+  }
+
+  .map-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+
+  .map-card.featured {
+    grid-column: 1 / -1;
+  }
+
+  .map-card img {
+    width: 100%;
+    display: block;
+    cursor: pointer;
+  }
+
+  .map-card .info {
+    padding: 1rem 1.2rem;
+  }
+
+  .map-card .info h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+
+  .map-card .info p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .map-card .info .tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    margin-top: 0.5rem;
+  }
+
+  .tag.hazard { background: #fce4ec; color: #b71c1c; }
+  .tag.ops { background: #e3f2fd; color: #0d47a1; }
+  .tag.overview { background: #e8f5e9; color: #1b5e20; }
+  .tag.districts { background: #fff3e0; color: #e65100; }
+
+  .approach {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto 3rem;
+  }
+
+  .approach h2 { margin-bottom: 1rem; }
+
+  .approach ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .approach li {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.95rem;
+  }
+
+  .approach li:last-child { border-bottom: none; }
+
+  .approach li strong { display: block; margin-bottom: 0.15rem; }
+
+  .approach li span { color: var(--muted); font-size: 0.85rem; }
+
+  .quickstart {
+    background: var(--text);
+    color: #e0e0e0;
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
+    max-width: 600px;
+    margin: 0 auto 3rem;
+    font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+    font-size: 0.88rem;
+    line-height: 1.8;
+    overflow-x: auto;
+  }
+
+  .quickstart .comment { color: #666; }
+  .quickstart .cmd { color: #81c784; }
+
+  footer {
+    border-top: 1px solid var(--border);
+    text-align: center;
+    padding: 2rem;
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  .disclaimer {
+    max-width: 700px;
+    margin: 0 auto 2rem;
+    padding: 1rem 1.5rem;
+    background: #fff8e1;
+    border: 1px solid #ffe082;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    color: #5d4037;
+    text-align: center;
+  }
+
+  /* Lightbox */
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 1000;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lightbox.active { display: flex; }
+
+  .lightbox img {
+    max-width: 95vw;
+    max-height: 95vh;
+    border-radius: 4px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Snohomish County Emergency Management Maps</h1>
+  <p>Open-data GIS maps for hazard analysis, emergency management, and search &amp; rescue operations. 11 maps, zero proprietary data, one command.</p>
+  <div class="links">
+    <a href="https://github.com/radiolabme/snohomish-em-maps">GitHub Repository</a>
+    <a href="https://github.com/radiolabme/snohomish-em-maps/blob/main/APPROACH.md">How It Was Built</a>
+    <a href="https://github.com/radiolabme/snohomish-em-maps/blob/main/DISCLAIMER.md">Disclaimer</a>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="stats">
+    <div class="stat red">
+      <div class="number">524,479</div>
+      <div class="label">People in FEMA high-risk flood zones (63.3%)</div>
+    </div>
+    <div class="stat purple">
+      <div class="number">52,392</div>
+      <div class="label">People in lahar inundation zones (6.3%)</div>
+    </div>
+    <div class="stat blue">
+      <div class="number">16</div>
+      <div class="label">Road segments identified as evacuation bottlenecks</div>
+    </div>
+    <div class="stat green">
+      <div class="number">0</div>
+      <div class="label">Emergency facilities in eastern wilderness half</div>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    For demonstration and educational purposes only. Not for operational, regulatory, or life-safety use.
+    See <a href="https://github.com/radiolabme/snohomish-em-maps/blob/main/DISCLAIMER.md">full disclaimer</a>.
+  </div>
+
+  <section>
+    <h2>Combined Map</h2>
+    <p>All hazard layers, roads, cities, public lands, and terrain in a single view.</p>
+    <div class="map-grid">
+      <div class="map-card featured">
+        <img src="examples/snohomish_combined.png" alt="Combined Hazard & Infrastructure Map" onclick="openLightbox(this)">
+        <div class="info">
+          <h3>Combined Hazard &amp; Infrastructure</h3>
+          <p>FEMA flood zones, Glacier Peak lahar paths, USGS hillshade terrain, WSDOT roads, 20 cities, National Forest, state parks, and water management district boundaries.</p>
+          <span class="tag overview">All Layers</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Hazard Layers</h2>
+    <p>Individual hazard maps isolated for focused analysis.</p>
+    <div class="map-grid">
+      <div class="map-card">
+        <img src="examples/snohomish_flood_zones.png" alt="FEMA Flood Hazard Zones" onclick="openLightbox(this)">
+        <div class="info">
+          <h3>FEMA Flood Hazard Zones</h3>
+          <p>3,348 flood zone polygons. Red = high risk (A/V zones), orange = moderate (0.2% annual chance).</p>
+          <span class="tag hazard">Hazard</span>
+        </div>
+      </div>
+      <div class="map-card">
+        <img src="examples/snohomish_volcanic.png" alt="Volcanic & Lahar Hazards" onclick="openLightbox(this)">
+        <div class="info">
+          <h3>Volcanic &amp; Lahar Hazards</h3>
+          <p>Glacier Peak and Mt Baker lahar flow paths, near-volcano hazard zone, and tephra (ash fall) coverage.</p>
+          <span class="tag hazard">Hazard</span>
+        </div>
+      </div>
+      <div class="map-card">
+        <img src="examples/snohomish_emergency_services.png" alt="Fire & Hospital Districts" onclick="openLightbox(this)">
+        <div class="info">
+          <h3>Fire &amp; Hospital Districts</h3>
+          <p>18 fire protection districts and 3 hospital districts with jurisdictional boundaries.</p>
+          <span class="tag districts">Districts</span>
+        </div>
+      </div>
+      <div class="map-card">
+        <img src="examples/snohomish_water_mgmt.png" alt="Water Management Districts" onclick="openLightbox(this)">
+        <div class="info">
+          <h3>Water Management Districts</h3>
+          <p>4 diking, 3 drainage, and 4 flood control district boundaries.</p>
+          <span class="tag districts">Districts</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Operational Maps</h2>
+    <p>Planning maps for emergency management and search &amp; rescue operations.</p>
+    <div class="map-grid">
+      <div class="map-card">
+        <img src="examples/snohomish_facilities.png" alt="Critical Facilities" onclick="openLightbox(this)">
+        <div class="info">
+          <h3>Critical Facilities</h3>
+          <p>9 hospitals, 70 fire stations, 243 schools, 20 police stations. The eastern wilderness gap is starkly visible.</p>
+          <span class="tag ops">Operations</span>
+        </div>
+      </div>
+      <div class="map-card">
+        <img src="examples/snohomish_terrain.png" alt="Terrain, Trails & SAR Access" onclick="openLightbox(this)">
+        <div class="info">
+          <h3>Terrain, Trails &amp; SAR Access</h3>
+          <p>4,636 hiking trails, 2,904 forest roads, and 9,568 waterways on prominent hillshade terrain.</p>
+          <span class="tag ops">Operations</span>
+        </div>
+      </div>
+      <div class="map-card">
+        <img src="examples/snohomish_population.png" alt="Population Density & Hazard Exposure" onclick="openLightbox(this)">
+        <div class="info">
+          <h3>Population Density &amp; Exposure</h3>
+          <p>Census block group density choropleth with FEMA flood and lahar zone boundaries overlaid. 524K flood-exposed, 52K lahar-exposed.</p>
+          <span class="tag ops">Operations</span>
+        </div>
+      </div>
+      <div class="map-card">
+        <img src="examples/snohomish_evacuation.png" alt="Evacuation Routes & Bottlenecks" onclick="openLightbox(this)">
+        <div class="info">
+          <h3>Evacuation Routes &amp; Bottlenecks</h3>
+          <p>Roads by capacity with 16 bottleneck segments highlighted. SR-530 to Darrington is the critical vulnerability.</p>
+          <span class="tag ops">Operations</span>
+        </div>
+      </div>
+      <div class="map-card">
+        <img src="examples/snohomish_rivers.png" alt="River Systems & Water Access" onclick="openLightbox(this)">
+        <div class="info">
+          <h3>River Systems &amp; Water Access</h3>
+          <p>19,705 waterways, 64 boat ramps, 13 labeled major rivers for swift water rescue planning.</p>
+          <span class="tag ops">Operations</span>
+        </div>
+      </div>
+      <div class="map-card">
+        <img src="examples/washington_counties.png" alt="Washington State Overview" onclick="openLightbox(this)">
+        <div class="info">
+          <h3>Washington State Overview</h3>
+          <p>All 39 Washington counties with Snohomish highlighted. Context map for regional orientation.</p>
+          <span class="tag overview">Overview</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="approach">
+    <h2>Data Sources</h2>
+    <ul>
+      <li><strong>FEMA National Flood Hazard Layer</strong> <span>Flood zones by risk classification — hazards.fema.gov</span></li>
+      <li><strong>WA Dept. of Natural Resources</strong> <span>Volcanic hazards, lahar zones — gis.dnr.wa.gov</span></li>
+      <li><strong>Snohomish County GIS</strong> <span>Districts, city boundaries, national forest — gis.snoco.org</span></li>
+      <li><strong>WSDOT</strong> <span>State route centerlines and road classification — data.wsdot.wa.gov</span></li>
+      <li><strong>USGS National Map</strong> <span>Hillshade terrain and National Hydrography Dataset — nationalmap.gov</span></li>
+      <li><strong>US Census Bureau</strong> <span>County boundaries, block groups, population — census.gov</span></li>
+      <li><strong>OpenStreetMap</strong> <span>Facilities, trails, boat ramps — overpass-api.de</span></li>
+      <li><strong>Natural Earth</strong> <span>10m coastline and lake polygons — naturalearthdata.com</span></li>
+    </ul>
+  </div>
+
+  <div class="quickstart">
+    <span class="comment"># Clone and generate all maps</span><br>
+    <span class="cmd">git clone https://github.com/radiolabme/snohomish-em-maps.git</span><br>
+    <span class="cmd">cd snohomish-em-maps</span><br>
+    <span class="cmd">pip install geopandas matplotlib adjustText pillow</span><br>
+    <span class="cmd">./generate.py all</span>
+  </div>
+
+</div>
+
+<footer>
+  <p>
+    <a href="https://github.com/radiolabme/snohomish-em-maps">Source on GitHub</a> ·
+    MIT License ·
+    <a href="https://github.com/radiolabme/snohomish-em-maps/blob/main/DISCLAIMER.md">Disclaimer</a>
+  </p>
+  <p style="margin-top: 0.5rem;">
+    All data from public US government and open-data sources. No API keys required.
+  </p>
+</footer>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script>
+function openLightbox(img) {
+  document.getElementById('lightbox-img').src = img.src;
+  document.getElementById('lightbox').classList.add('active');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('active');
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeLightbox();
+});
+</script>
+
+</body>
+</html>
